@@ -1,0 +1,53 @@
+protocols = imap pop3
+listen = *
+
+mail_location = maildir:/data/mail/%d/%n/Maildir
+
+ssl = required
+ssl_cert = </data/tls/fullchain.pem
+ssl_key = </data/tls/privkey.pem
+
+auth_mechanisms = plain login
+
+passdb {
+  driver = passwd-file
+  args = /data/users-auth
+}
+
+userdb {
+  driver = static
+  args = uid=vmail gid=vmail home=/data/mail/%d/%n
+}
+
+#namespace inbox {
+#  inbox = yes
+#}
+
+service auth {
+  unix_listener /var/spool/postfix/private/auth {
+    mode = 0660
+    user = postfix
+    group = postfix
+  }
+}
+
+namespace inbox {
+  inbox = yes
+  # Map special folders
+  mailbox Sent {
+    auto = subscribe
+    special_use = \Sent
+  }
+  mailbox Drafts {
+    auto = subscribe
+    special_use = \Drafts
+  }
+  mailbox Trash {
+    auto = subscribe
+    special_use = \Trash
+  }
+  mailbox Junk {
+    auto = subscribe
+    special_use = \Junk
+  }
+}
