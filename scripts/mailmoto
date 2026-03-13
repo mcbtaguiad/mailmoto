@@ -1,0 +1,35 @@
+#!/bin/bash
+set -e
+
+EMAIL=$1
+PASSWORD=$2
+DATA_DIR=/data
+
+if [ -z "$EMAIL" ] || [ -z "$PASSWORD" ]; then
+  echo "Usage: $0 email password"
+  exit 1
+fi
+
+USER=$(echo $EMAIL | cut -d@ -f1)
+DOMAIN=$(echo $EMAIL | cut -d@ -f2)
+
+MAILDIR="$DATA_DIR/mail/$DOMAIN/$USER/Maildir"
+
+echo "Creating mailbox $EMAIL"
+mkdir -p "$MAILDIR"
+maildirmake.dovecot "$MAILDIR"
+
+# create password hash
+HASH=$(doveadm pw -s SHA512-CRYPT -p "$PASSWORD")
+
+# Add user to Dovecot auth file
+echo "$EMAIL:$HASH" >> $DATA_DIR/users-auth
+
+# Add user to Postfix virtual mailbox map
+echo "$EMAIL $DOMAIN/$USER/Maildir/" >> $DATA_DIR/virtual_mailboxes
+postmap $DATA_DIR/virtual_mailboxes
+
+# Fix ownership
+chown -R 5000:5000 "$DATA_DIR/mail"
+
+echo "Mailbox created at $MAILDIR"
