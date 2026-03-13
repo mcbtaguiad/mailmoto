@@ -1,0 +1,27 @@
+services:
+  mailmoto:
+    container_name: mailmoto
+    image: ghcr.io/mcbtaguiad/mailmoto:v0.0.1
+    environment:
+      MAIL_HOSTNAME: mail.marktaguiad.dev
+      MAIL_DOMAIN: marktaguiad.dev
+      # ADMIN_EMAIL: tagsadmin@marktaguiad.dev
+      # ADMIN_PASS: Therealdeal1!
+    volumes:
+      - /root/tls/mail.marktaguiad.dev.crt:/data/tls/fullchain.pem
+      - /root/tls/mail.marktaguiad.dev.key:/data/tls/privkey.pem
+      # - /opt/pangolin/config/letsencrypt/certs/certs/mail.marktaguiad.dev.crt:/data/tls/fullchain.pem
+      # - /opt/pangolin/config/letsencrypt/certs/private/mail.marktaguiad.dev.key:/data/tls/privkey.pem
+      # - /srv/volume/mailmoto/data:/data
+      # - /srv/volume/mailmoto/dkim:/data/dkim
+      # - /srv/volume/mailmoto/log/:/var/log/
+    ports:
+      - "25:25"
+      - "587:587"
+      - "465:465"
+      - "143:143"
+      - "993:993" 
+    build:
+        context: .
+        dockerfile: Dockerfile
+    restart: always
