@@ -10,7 +10,6 @@ RUN apt-get update && \
         dovecot-pop3d \
         dovecot-core \
         mailutils \
-	rspamd \
 	opendkim \
 	opendkim-tools \
 	mailutils \
@@ -19,19 +18,14 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Set Dovecot logging to stdout and enable auth debug
-RUN sed -i 's|^#log_path =.*|log_path = /dev/stdout|' /etc/dovecot/conf.d/10-logging.conf \
- && sed -i 's|^#info_log_path =.*|info_log_path = /dev/stdout|' /etc/dovecot/conf.d/10-logging.conf \
- && sed -i 's|^#auth_verbose =.*|auth_verbose = yes|' /etc/dovecot/conf.d/10-logging.conf \
- && sed -i 's|^#auth_debug =.*|auth_debug = yes|' /etc/dovecot/conf.d/10-logging.conf \
- && sed -i 's|^#auth_debug_passwords =.*|auth_debug_passwords = no|' /etc/dovecot/conf.d/10-logging.conf
-
 # create virtual mail user
 RUN groupadd -g 5000 vmail \
  && useradd -g vmail -u 5000 vmail -d /data/mail -m
 
 RUN mkdir -p /data/mail \
  && chown -R vmail:vmail /data
+
+RUN usermod -aG opendkim postfix 
 
 # Postfix configs 
 COPY postfix/main.cf.template /etc/postfix/main.cf.template
@@ -40,13 +34,16 @@ COPY postfix/master.cf /etc/postfix/master.cf
 # Dovecot configs
 COPY dovecot/dovecot.conf.template /etc/dovecot/dovecot.conf.template
 
+# Opendkim
+COPY opendkim/opendkim.conf.template /etc/opendkim.conf.template
+
+
 # Scripts
 # Copy initialization scripts
 COPY scripts/init_domain.sh /init_domain.sh
 
 COPY scripts/entrypoint.sh /entrypoint.sh
 COPY scripts/mailmoto /mailmoto
-
 
 
 RUN chmod +x /entrypoint.sh
