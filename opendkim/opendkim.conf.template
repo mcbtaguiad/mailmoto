@@ -1,0 +1,13 @@
+Syslog yes
+UMask 002
+Canonicalization relaxed/simple
+Mode sv
+SubDomains yes
+
+Socket inet:8891@127.0.0.1
+
+KeyTable /data/dkim/key.table
+SigningTable refile:/data/dkim/signing.table
+InternalHosts refile:/data/dkim/trusted.hosts
+
+Domain ${MAIL_DOMAIN}

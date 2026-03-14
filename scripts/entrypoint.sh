@@ -13,6 +13,9 @@ sed -i 's|^mailbox_command =.*|mailbox_command = /usr/lib/dovecot/deliver -d \${
 # Generate dovecot config
 envsubst < /etc/dovecot/dovecot.conf.template > /etc/dovecot/dovecot.conf
 
+# Generate opendkim config
+envsubst < /etc/opendkim.conf.template > /etc/opendkim.conf
+
 # Run domain init if first start
 if [ ! -f /data/.initialized ]; then
   /init_domain.sh
@@ -27,8 +30,7 @@ fi
 # cat /etc/postfix/main.cf
 
 # Start services
-# service opendkim start
-# service rspamd start
+service opendkim start
 service dovecot start
 service postfix start
 
