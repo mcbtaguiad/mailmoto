@@ -10,7 +10,7 @@ DATA_DIR=/data
 
 echo "[INIT] Setting up domain: $DOMAIN"
 
-# 1. Create mail and DKIM directories
+# 1. Create DKIM dir
 mkdir -p "$DATA_DIR/mail/$DOMAIN"
 mkdir -p "$DATA_DIR/dkim/$DOMAIN"
 
