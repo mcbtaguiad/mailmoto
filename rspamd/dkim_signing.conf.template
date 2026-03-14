@@ -1,0 +1,19 @@
+# Enable DKIM signing
+enabled = true;
+
+# Default signing configuration
+domain {
+  ${MAIL_DOMAIN} {
+    selector = "mail";
+    path = "/data/dkim/${MAIL_DOMAIN}/mail.private";
+  }
+}
+
+# Sign outbound mail only
+sign_authenticated = true;
+sign_local = true;
+sign_inbound = false;
+
+# Default settings
+use_esld = true;
+check_pubkey = true;

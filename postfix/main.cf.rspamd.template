@@ -51,7 +51,6 @@ smtpd_sasl_auth_enable = yes
 smtpd_recipient_restrictions =
  permit_sasl_authenticated,
  permit_mynetworks,
- check_policy_service inet:127.0.0.1:10023,
  reject_unauth_destination
 
 # Virtual Mail
@@ -63,14 +62,10 @@ virtual_uid_maps = static:5000
 virtual_gid_maps = static:5000
 
 # DKIM / Spam
-# smtpd_milters = unix:/var/spool/postfix/var/run/opendkim/opendkim.sock
-# non_smtpd_milters = unix:/var/spool/postfix/var/run/opendkim/opendkim.sock
-# milter_default_action = accept
-
-smtpd_milters = inet:127.0.0.1:8891, inet:127.0.0.1:8893
-non_smtpd_milters = $smtpd_milters 
-milter_default_action = accept
 milter_protocol = 6
+milter_default_action = accept
+smtpd_milters = inet:127.0.0.1:11332
+non_smtpd_milters = inet:127.0.0.1:11332
 
 # Logs
 # maillog_file = /dev/stdout

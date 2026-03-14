@@ -16,6 +16,9 @@ RUN apt-get update && \
 	opendkim-tools \
 	opendmarc \
 	mailutils \
+	postgrey \
+	rspamd \
+	redis-server \
         gettext && \
     mkdir -p /etc/postfix/tls && \
     apt-get clean && \
@@ -32,6 +35,7 @@ RUN usermod -aG opendkim postfix
 
 # Postfix configs 
 COPY postfix/main.cf.template /etc/postfix/main.cf.template
+COPY postfix/main.cf.rspamd.template /etc/postfix/main.cf.rspamd.template
 COPY postfix/master.cf /etc/postfix/master.cf
 
 # Dovecot configs
@@ -42,6 +46,12 @@ COPY opendkim/opendkim.conf.template /etc/opendkim.conf.template
 
 # Opendkim
 COPY opendmarc/opendmarc.conf.template /etc/opendmarc.conf.template
+
+# Rspamd
+COPY rspamd/dkim_signing.conf.template /etc/rspamd/local.d/dkim_signing.conf.template
+COPY rspamd/dmarc.conf.template /etc/rspamd/local.d/dmarc.conf.template
+COPY rspamd/redis.conf /etc/rspamd/local.d/redis.conf
+COPY rspamd/logging.inc /etc/rspamd/local.d/logging.inc
 
 # Scripts
 # Copy initialization scripts

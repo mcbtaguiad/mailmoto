@@ -1,0 +1,38 @@
+reporting {
+  enabled = true;
+
+  # Required
+  email = "dmarc-reports@{MAIL_DOMAIN}";
+  domain = "${MAIL_DOMAIN}";
+  org_name = "${MAIL_DOMAIN}";
+
+  # Optional reporting settings
+  max_entries = 1000;
+  keys_expire = 2d;
+
+  # Use local SMTP server to send reports
+  smtp = "127.0.0.1";
+  smtp_port = 25;
+  helo = "mail.${MAIL_DOMAIN}";
+
+  # From name for DMARC reports
+  from_name = "Rspamd DMARC";
+  msgid_from = "rspamd";
+
+}
+
+actions {
+  reject = "reject";
+  quarantine = "add header";
+  softfail = "accept";
+  none = "accept";
+}
+
+# Optional: Munging for mailing lists (prevents DMARC breakage)
+munging {
+  list_map = "/etc/rspamd/maps.d/dmarc_munging.map"; # define your mailing lists here
+  mitigate_strict_only = false;
+  reply_goes_to_list = false;
+  mitigate_allow_only = true;
+  munge_from = true;
+}
