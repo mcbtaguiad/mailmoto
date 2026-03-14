@@ -1,0 +1,11 @@
+AuthservID ${MAIL_HOSTNAME}
+TrustedAuthservIDs ${MAIL_HOSTNAME}
+IgnoreAuthenticatedClients true
+
+Socket inet:8893@127.0.0.1
+
+RejectFailures false
+Syslog true
+
+UMask 002
+UserID opendmarc:opendmarc

@@ -1,12 +1,10 @@
 services:
   mailmoto:
     container_name: mailmoto
-    image: ghcr.io/mcbtaguiad/mailmoto:v0.1.0
+    image: ghcr.io/mcbtaguiad/mailmoto:v0.1.1
     environment:
       MAIL_HOSTNAME: mail.marktaguiad.dev
       MAIL_DOMAIN: marktaguiad.dev
-      # ADMIN_EMAIL: tagsadmin@marktaguiad.dev
-      # ADMIN_PASS: Therealdeal1!
     volumes:
       - /root/tls/mail.marktaguiad.dev.crt:/data/tls/fullchain.pem
       - /root/tls/mail.marktaguiad.dev.key:/data/tls/privkey.pem
