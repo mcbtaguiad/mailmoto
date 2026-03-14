@@ -2,32 +2,30 @@
 set -e
 
 # Domain config from environment
-DOMAIN=${MAIL_DOMAIN:-example.com}
-HOSTNAME=${MAIL_HOSTNAME:-mail.example.com}
-
+MAIL_DOMAIN=${MAIL_DOMAIN:-example.com}
+MAIL_HOSTNAME=${MAIL_HOSTNAME:-mail.example.com}
 
 DATA_DIR=/data
 
 echo "[INIT] Setting up domain: $DOMAIN"
 
-# 1. Create DKIM dir
-mkdir -p "$DATA_DIR/mail/$DOMAIN"
-mkdir -p "$DATA_DIR/dkim/$DOMAIN"
+# Create  dir
+mkdir -p "$DATA_DIR/mail/$MAIL_DOMAIN"
+mkdir -p "$DATA_DIR/dkim/$MAIL_DOMAIN"
 
-# 2. Create DKIM keys if not exist
-if [ ! -f "$DATA_DIR/dkim/$DOMAIN/mail.private" ]; then
+# Create DKIM keys if not exist
+if [ ! -f "$DATA_DIR/dkim/$MAIL_DOMAIN/mail.private" ]; then
   echo "[INIT] Generating DKIM keys for $DOMAIN"
-  opendkim-genkey -b 1024 -D "$DATA_DIR/dkim/$DOMAIN" -d "$DOMAIN" -s mail
-  chown -R opendkim:opendkim "$DATA_DIR/dkim/$DOMAIN"
+  opendkim-genkey -b 1024 -D "$DATA_DIR/dkim/$MAIL_DOMAIN" -d "$MAIL_DOMAIN" -s mail
 fi
 
-# 3. Setup DKIM tables
+# Setup DKIM tables
 cat > "$DATA_DIR/dkim/key.table" <<EOF
-mail._domainkey.$DOMAIN $DOMAIN:mail:$DATA_DIR/dkim/$DOMAIN/mail.private
+mail._domainkey.$MAIL_DOMAIN $MAIL_DOMAIN:mail:$DATA_DIR/dkim/$MAIL_DOMAIN/mail.private
 EOF
 
 cat > "$DATA_DIR/dkim/signing.table" <<EOF
-*@${DOMAIN} mail._domainkey.$DOMAIN
+*@$MAIL_{DOMAIN} mail._domainkey.$MAIL_DOMAIN
 EOF
 
 cat > "$DATA_DIR/dkim/trusted.hosts" <<EOF
@@ -39,4 +37,4 @@ EOF
 
 
 
-echo "[INIT] Domain $DOMAIN setup complete."
+echo "[INIT] Domain $MAIL_DOMAIN setup complete."
