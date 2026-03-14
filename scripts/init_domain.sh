@@ -17,8 +17,8 @@ mkdir -p "$DATA_DIR/dkim/$DOMAIN"
 # 2. Create DKIM keys if not exist
 if [ ! -f "$DATA_DIR/dkim/$DOMAIN/mail.private" ]; then
   echo "[INIT] Generating DKIM keys for $DOMAIN"
-  opendkim-genkey -D "$DATA_DIR/dkim/$DOMAIN" -d "$DOMAIN" -s mail
-  chown -R 5000:5000 "$DATA_DIR/dkim/$DOMAIN"
+  opendkim-genkey -b 1024 -D "$DATA_DIR/dkim/$DOMAIN" -d "$DOMAIN" -s mail
+  chown -R opendkim:opendkim "$DATA_DIR/dkim/$DOMAIN"
 fi
 
 # 3. Setup DKIM tables
@@ -32,7 +32,9 @@ EOF
 
 cat > "$DATA_DIR/dkim/trusted.hosts" <<EOF
 127.0.0.1
+::1
 localhost
+*.${MAIL_DOMAIN}
 EOF
 
 
