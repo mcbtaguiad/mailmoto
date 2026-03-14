@@ -51,3 +51,15 @@ namespace inbox {
     special_use = \Junk
   }
 }
+
+log_path = /var/log/mail.log
+info_log_path = /var/log/mail.log
+# debug_log_path = /var/log/mail.log
+syslog_facility = mail
+
+auth_verbose = yes
+auth_debug = no
+auth_debug_passwords = no
+mail_debug = no
+verbose_ssl = no
+
