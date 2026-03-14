@@ -15,6 +15,18 @@ proxywrite unix -       -       n       -       1       proxymap
 smtp      unix  -       -       y       -       -       smtp
 relay     unix  -       -       y       -       -       smtp
 
+anvil	 unix	-	-	n	-	1	anvil
+scache	 unix	-	-	n	-	1	scache
+discard	 unix	-	-	n	-	-	discard
+retry     unix  -       -       n       -       -       error
+#smtp      inet  n       -       n       -       1       postscreen
+#smtpd     pass  -       -       n       -       -       smtpd
+#dnsblog   unix  -       -       n       -       0       dnsblog
+#tlsproxy  unix  -       -       n       -       0       tlsproxy
+postlog   unix-dgram n  -       n       -       1       postlogd
+virtual   unix  -       n       n       -       -       virtual
+showq     unix  n       -       n       -       -       showq
+
 # Mail submission (STARTTLS)
 submission inet n       -       y       -       -       smtpd
   -o syslog_name=postfix/submission
@@ -28,16 +40,3 @@ submission inet n       -       y       -       -       smtpd
 smtps     inet  n       -       y       -       -       smtpd
   -o smtpd_tls_wrappermode=yes
   -o smtpd_sasl_auth_enable=yes
-
-anvil	 unix	-	-	n	-	1	anvil
-scache	 unix	-	-	n	-	1	scache
-discard	 unix	-	-	n	-	-	discard
-retry     unix  -       -       n       -       -       error
-#smtp      inet  n       -       n       -       1       postscreen
-#smtpd     pass  -       -       n       -       -       smtpd
-#dnsblog   unix  -       -       n       -       0       dnsblog
-#tlsproxy  unix  -       -       n       -       0       tlsproxy
-postlog   unix-dgram n  -       n       -       1       postlogd
-virtual   unix  -       n       n       -       -       virtual
-showq     unix  n       -       n       -       -       showq
-
