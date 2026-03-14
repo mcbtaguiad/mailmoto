@@ -3,6 +3,8 @@ FROM ubuntu:24.04
 LABEL Maintainer="Mark Taguiad <marktaguiad@marktaguiad.dev>"
 LABEL Description="Docker MailMoTo"
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && \
     apt-get install -y \
         postfix \
@@ -12,6 +14,7 @@ RUN apt-get update && \
         mailutils \
 	opendkim \
 	opendkim-tools \
+	opendmarc \
 	mailutils \
         gettext && \
     mkdir -p /etc/postfix/tls && \
@@ -37,6 +40,8 @@ COPY dovecot/dovecot.conf.template /etc/dovecot/dovecot.conf.template
 # Opendkim
 COPY opendkim/opendkim.conf.template /etc/opendkim.conf.template
 
+# Opendkim
+COPY opendmarc/opendmarc.conf.template /etc/opendmarc.conf.template
 
 # Scripts
 # Copy initialization scripts

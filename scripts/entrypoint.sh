@@ -16,6 +16,9 @@ envsubst < /etc/dovecot/dovecot.conf.template > /etc/dovecot/dovecot.conf
 # Generate opendkim config
 envsubst < /etc/opendkim.conf.template > /etc/opendkim.conf
 
+# Generate opendmarc config
+envsubst < /etc/opendmarc.conf.template > /etc/opendmarc.conf 
+
 # Run domain init if first start
 if [ ! -f /data/.initialized ]; then
   /init_domain.sh
@@ -31,6 +34,7 @@ fi
 
 # Start services
 service opendkim start
+service opendmarc start
 service dovecot start
 service postfix start
 
