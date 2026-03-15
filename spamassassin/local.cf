@@ -1,0 +1,38 @@
+# Spam score threshold
+required_score 5.0
+
+# Rewrite subject of spam messages
+rewrite_header Subject ***SPAM***
+
+# Don't encapsulate spam in attachments
+report_safe 0
+
+# Bayesian filtering
+use_bayes 1
+bayes_auto_learn 1
+bayes_auto_learn_threshold_spam 6.0
+bayes_auto_learn_threshold_nonspam -0.1
+
+# Network spam detection
+use_razor2 1
+use_pyzor 1
+use_dcc 1
+
+# DNS checks
+skip_rbl_checks 0
+dns_available yes
+
+# Add headers
+add_header all Report _REPORT_
+add_header spam Flag _YESNOCAPS_
+add_header spam Status _YESNO_, score=_SCORE_ required=_REQUIRED_
+
+# Automatically learn from messages
+bayes_learn_to_journal 1
+
+# Trusted networks
+trusted_networks 127.0.0.1
+internal_networks 127.0.0.1
+
+rewrite_header Subject *****SPAM*****
+report_safe 0
