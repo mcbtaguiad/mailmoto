@@ -1,11 +1,11 @@
 services:
   mailmoto:
     container_name: mailmoto
-    image: ghcr.io/mcbtaguiad/mailmoto:v0.1.2
+    image: ghcr.io/mcbtaguiad/mailmoto:v0.1.3
     environment:
       MAIL_HOSTNAME: mail.marktaguiad.dev
       MAIL_DOMAIN: marktaguiad.dev
-      RSPAMD_ENABLE: true
+      RSPAMD_ENABLE: false
     volumes:
       - /root/tls/mail.marktaguiad.dev.crt:/data/tls/fullchain.pem
       - /root/tls/mail.marktaguiad.dev.key:/data/tls/privkey.pem
