@@ -1,35 +1,84 @@
 #!/bin/bash
 set -e
 
-EMAIL=$1
-PASSWORD=$2
 DATA_DIR=/data
+MAIL_BASE="$DATA_DIR/mail"
+AUTH_FILE="$DATA_DIR/users-auth"
+VIRTUAL_FILE="$DATA_DIR/virtual_mailboxes"
 
-if [ -z "$EMAIL" ] || [ -z "$PASSWORD" ]; then
-  echo "Usage: $0 email password"
-  exit 1
-fi
+create_user() {
+  EMAIL=$1
+  PASSWORD=$2
 
-USER=$(echo $EMAIL | cut -d@ -f1)
-DOMAIN=$(echo $EMAIL | cut -d@ -f2)
+  USER=$(echo $EMAIL | cut -d@ -f1)
+  DOMAIN=$(echo $EMAIL | cut -d@ -f2)
+  MAILDIR="$MAIL_BASE/$DOMAIN/$USER/Maildir"
 
-MAILDIR="$DATA_DIR/mail/$DOMAIN/$USER/Maildir"
+  echo "Creating mailbox $EMAIL"
 
-echo "Creating mailbox $EMAIL"
-mkdir -p "$MAILDIR"
-maildirmake.dovecot "$MAILDIR"
+  mkdir -p "$MAILDIR"
+  maildirmake.dovecot "$MAILDIR"
 
-# create password hash
-HASH=$(doveadm pw -s SHA512-CRYPT -p "$PASSWORD")
+  HASH=$(doveadm pw -s SHA512-CRYPT -p "$PASSWORD")
 
-# Add user to Dovecot auth file
-echo "$EMAIL:$HASH" >> $DATA_DIR/users-auth
+  echo "$EMAIL:$HASH" >> "$AUTH_FILE"
+  echo "$EMAIL $DOMAIN/$USER/Maildir/" >> "$VIRTUAL_FILE"
 
-# Add user to Postfix virtual mailbox map
-echo "$EMAIL $DOMAIN/$USER/Maildir/" >> $DATA_DIR/virtual_mailboxes
-postmap $DATA_DIR/virtual_mailboxes
+  postmap "$VIRTUAL_FILE"
 
-# Fix ownership
-chown -R 5000:5000 "$DATA_DIR/mail"
+  chown -R 5000:5000 "$MAIL_BASE"
 
-echo "Mailbox created at $MAILDIR"
+  echo "User created: $EMAIL"
+}
+
+update_password() {
+  EMAIL=$1
+  PASSWORD=$2
+
+  HASH=$(doveadm pw -s SHA512-CRYPT -p "$PASSWORD")
+
+  echo "Updating password for $EMAIL"
+
+  sed -i "/^$EMAIL:/d" "$AUTH_FILE"
+  echo "$EMAIL:$HASH" >> "$AUTH_FILE"
+
+  echo "Password updated"
+}
+
+delete_user() {
+  EMAIL=$1
+
+  USER=$(echo $EMAIL | cut -d@ -f1)
+  DOMAIN=$(echo $EMAIL | cut -d@ -f2)
+  MAILDIR="$MAIL_BASE/$DOMAIN/$USER"
+
+  echo "Deleting mailbox $EMAIL"
+
+  sed -i "/^$EMAIL:/d" "$AUTH_FILE"
+  sed -i "/^$EMAIL /d" "$VIRTUAL_FILE"
+
+  rm -rf "$MAILDIR"
+
+  postmap "$VIRTUAL_FILE"
+
+  echo "User deleted"
+}
+
+case "$1" in
+  create)
+    create_user "$2" "$3"
+    ;;
+  passwd)
+    update_password "$2" "$3"
+    ;;
+  delete)
+    delete_user "$2"
+    ;;
+  *)
+    echo "MailMoTo Usage:"
+    echo "$0 create email password"
+    echo "$0 passwd email password"
+    echo "$0 delete email"
+    exit 1
+    ;;
+esac
