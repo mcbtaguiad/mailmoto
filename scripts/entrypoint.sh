@@ -19,6 +19,10 @@ printf '\n
  ░███ ░███ ░███  ███░░███  ░███  ░███  ░███ ░███ ░███ ░███ ░███  ░███ ███░███ ░███
  █████░███ █████░░████████ █████ █████ █████░███ █████░░██████   ░░█████ ░░██████ 
 ░░░░░ ░░░ ░░░░░  ░░░░░░░░ ░░░░░ ░░░░░ ░░░░░ ░░░ ░░░░░  ░░░░░░     ░░░░░   ░░░░░░  
+
+Author: Mark Taguiad <marktaguiad@marktaguaid.dev>
+Site: https://marktaguiad.dev
+
 '
 
 # Run domain init if first start
@@ -66,6 +70,8 @@ else
   # Generate opendkim config
   envsubst < /etc/opendkim.conf.template > /etc/opendkim.conf
 
+  usermod -aG opendkim postfix 
+
   # Generate opendmarc config
   envsubst < /etc/opendmarc.conf.template > /etc/opendmarc.conf 
 
@@ -73,14 +79,29 @@ else
   echo $MAIL_HOSTNAME >> /etc/postgrey/whitelist_clients
   sed -i 's|POSTGREY_OPTS="--inet=10023"|POSTGREY_OPTS="--delay=120 --max-age=35 --inet=127.0.0.1:10023"|' /etc/default/postgrey
 
+  # Spamassassin config
+cat << 'EOF' >> /etc/postfix/master.cf
+  -o content_filter=spamassassin
+spamassassin unix -     n       n       -       -       pipe
+    user=spamd argv=/usr/bin/spamc -f -e /usr/sbin/sendmail -oi -f ${sender} ${recipient}
+EOF
+  groupadd -r spamd
+  useradd -r -g spamd -s /usr/sbin/nologin -d /var/lib/spamassassin spamd
+
+  mkdir -p /var/lib/spamassassin
+  chown spamd:spamd /var/lib/spamassassin
+
+
   chown -R opendkim:opendkim "$DATA_DIR/dkim/$MAIL_DOMAIN" 
   
   echo "[OPENDKIM] Starting"
   service opendkim start
-  echo "[OPENDMARD] Starting"
+  echo "[OPENDMARC] Starting"
   service opendmarc start
   echo "[POSTGRAY] Starting"
   service postgrey start
+  echo "[SPAMASSASSIN] Starting"
+  service spamd start
   echo "[DOVECOT] Starting"
   service dovecot start
   echo "[POSTFIX] Starting"
