@@ -19,6 +19,8 @@ RUN apt-get update && \
 	postgrey \
 	rspamd \
 	redis-server \
+	spamassassin \ 
+	spamd \
         gettext && \
     mkdir -p /etc/postfix/tls && \
     apt-get clean && \
@@ -31,7 +33,6 @@ RUN groupadd -g 5000 vmail \
 RUN mkdir -p /data/mail \
  && chown -R vmail:vmail /data
 
-RUN usermod -aG opendkim postfix 
 
 # Postfix configs 
 COPY postfix/main.cf.template /etc/postfix/main.cf.template
@@ -52,6 +53,10 @@ COPY rspamd/dkim_signing.conf.template /etc/rspamd/local.d/dkim_signing.conf.tem
 COPY rspamd/dmarc.conf.template /etc/rspamd/local.d/dmarc.conf.template
 COPY rspamd/redis.conf /etc/rspamd/local.d/redis.conf
 COPY rspamd/logging.inc /etc/rspamd/local.d/logging.inc
+
+# Spamassassin
+COPY spamassassin/local.cf /etc/spamassassin/local.cf
+COPY spamassassin/spamd /etc/default/spamd
 
 # Scripts
 # Copy initialization scripts
