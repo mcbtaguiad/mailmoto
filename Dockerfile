@@ -21,6 +21,7 @@ RUN apt-get update && \
 	redis-server \
 	spamassassin \ 
 	spamd \
+	netcat-traditional \
         gettext && \
     mkdir -p /etc/postfix/tls && \
     apt-get clean && \
@@ -45,7 +46,7 @@ COPY dovecot/dovecot.conf.template /etc/dovecot/dovecot.conf.template
 # Opendkim
 COPY opendkim/opendkim.conf.template /etc/opendkim.conf.template
 
-# Opendkim
+# Opendmarc
 COPY opendmarc/opendmarc.conf.template /etc/opendmarc.conf.template
 
 # Rspamd
@@ -65,8 +66,9 @@ COPY scripts/init_domain.sh /init_domain.sh
 COPY scripts/entrypoint.sh /entrypoint.sh
 COPY scripts/mailmoto /mailmoto
 
-
 RUN chmod +x /entrypoint.sh
+RUN chmod +x /mailmoto
+RUN chmod +x /init_domain.sh
 
 EXPOSE 25 587 465 143 993
 

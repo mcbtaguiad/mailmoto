@@ -1,26 +1,38 @@
 services:
   mailmoto:
     container_name: mailmoto
-    image: ghcr.io/mcbtaguiad/mailmoto:v0.1.3
+    image: ghcr.io/mcbtaguiad/mailmoto:v0.1.4
+    build:
+        context: .
+        dockerfile: Dockerfile
     environment:
-      MAIL_HOSTNAME: mail.marktaguiad.dev
-      MAIL_DOMAIN: marktaguiad.dev
-      RSPAMD_ENABLE: false
+      MAIL_HOSTNAME: mail.yourdomain
+      MAIL_DOMAIN: yourdomain
+      RSPAMD_ENABLE: true
     volumes:
-      - /root/tls/mail.marktaguiad.dev.crt:/data/tls/fullchain.pem
-      - /root/tls/mail.marktaguiad.dev.key:/data/tls/privkey.pem
-      # - /opt/pangolin/config/letsencrypt/certs/certs/mail.marktaguiad.dev.crt:/data/tls/fullchain.pem
-      # - /opt/pangolin/config/letsencrypt/certs/private/mail.marktaguiad.dev.key:/data/tls/privkey.pem
-      # - /srv/volume/mailmoto/data:/data
-      # - /srv/volume/mailmoto/dkim:/data/dkim
-      # - /srv/volume/mailmoto/log/:/var/log/
+      - ./tls/fullchain.pem:/data/tls/fullchain.pem
+      - ./tls/privkey.pem:/data/tls/privkey.pem
+      - ./data:/data
+      # - ./log/mail.log:/var/log/mail.log
     ports:
       - "25:25"
       - "587:587"
       - "465:465"
       - "143:143"
       - "993:993" 
-    build:
-        context: .
-        dockerfile: Dockerfile
     restart: always
+    healthcheck:
+      test:
+        - CMD
+        - nc
+        - -z
+        - localhost
+        - "25"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
