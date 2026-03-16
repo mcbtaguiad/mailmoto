@@ -117,9 +117,27 @@ Creating mailbox user@marktaguiad.dev
 User created: user@marktaguiad.dev
 ```
 ### Logging
-You can mount `/var/log/mail.log` if you plan to use `fail2ban`. If not just simply use docker stdout. 
+You can mount `/var/log/mail.log` if you plan to use `fail2ban`. 
 
-If the container failed to start, make sure *mail.log* exist on the host - if mounted. 
+To make `fail2ban` work, change the `logpath` in `/etc/fail2ban/filter.d/`, or just create a config file in `/etc/fail2ban/jail.d`. 
 
+*mailmoto.conf*
+```
+[postfix]
+enabled = true
+logpath = /srv/volume/mailmoto/mail.log # dir path where i mount logs
+maxretry = 3
+bantime = 3600
+action = nftables[name=POSTFIX, port=smtp, protocol=tcp]
+
+[dovecot]
+enabled = true
+logpath = /srv/volume/mailmoto/mail.log
+maxretry = 3
+bantime = 3600
+action = nftables[name=DOVECOT, port=imap, protocol=tcp]
+```
+
+If the container fails to start, make sure *mail.log* exist on the host - if mounted. 
 ### Testing
 Send email to gmail, if your email server or IP is reputable it would be received by gmail. Click on your message and click on `show original`. SPF, DKIM and DMARC should show 'PASS'. Reply and send, if spamassassin or rspamd is working then you would received the email from gmail. 
