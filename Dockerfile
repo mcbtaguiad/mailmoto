@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
 LABEL Maintainer="Mark Taguiad <marktaguiad@marktaguiad.dev>"
 LABEL Description="Docker MailMoTo"
@@ -26,6 +26,9 @@ RUN apt-get update && \
     mkdir -p /etc/postfix/tls && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+RUN rm -f /etc/ssl/private/ssl-cert-snakeoil.key \
+           /etc/ssl/certs/ssl-cert-snakeoil.pem
 
 # create virtual mail user
 RUN groupadd -g 5000 vmail \
