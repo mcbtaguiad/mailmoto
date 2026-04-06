@@ -1,27 +1,31 @@
+dovecot_config_version = 2.4.1
+dovecot_storage_version = 2.4.1
+
 protocols = imap pop3
 listen = *
 
-mail_location = maildir:/data/mail/%d/%n/Maildir
+mail_driver = maildir
+mail_path = /data/mail/%{user | domain}/%{user | username}/Maildir
 
-ssl = required
-ssl_cert = </data/tls/fullchain.pem
-ssl_key = </data/tls/privkey.pem
+ssl = yes
+ssl_server_cert_file = /data/tls/fullchain.pem
+ssl_server_key_file = /data/tls/privkey.pem
 
 auth_mechanisms = plain login
 
-passdb {
+passdb passwd-file {
   driver = passwd-file
-  args = /data/users-auth
+  passwd_file_path = /data/users-auth
 }
 
-userdb {
+userdb static {
   driver = static
-  args = uid=vmail gid=vmail home=/data/mail/%d/%n
+  fields {
+    uid = 5000
+    gid = 5000
+    home = /data/mail/%{user | domain}/%{user | username}
+  }
 }
-
-#namespace inbox {
-#  inbox = yes
-#}
 
 service auth {
   unix_listener /var/spool/postfix/private/auth {
@@ -54,12 +58,6 @@ namespace inbox {
 
 log_path = /var/log/mail.log
 info_log_path = /var/log/mail.log
-# debug_log_path = /var/log/mail.log
 syslog_facility = mail
 
 auth_verbose = yes
-auth_debug = no
-auth_debug_passwords = no
-mail_debug = no
-verbose_ssl = no
-

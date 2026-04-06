@@ -2,7 +2,7 @@ reporting {
   enabled = true;
 
   # Required
-  email = "dmarc-reports@{MAIL_DOMAIN}";
+  email = "dmarc-reports@${MAIL_DOMAIN}";
   domain = "${MAIL_DOMAIN}";
   org_name = "${MAIL_DOMAIN}";
 

@@ -8,7 +8,7 @@ DATA_DIR=/data
 
 export MAIL_DOMAIN
 export MAIL_HOSTNAME
-export RSPAMD
+export RSPAMD_ENABLE=${RSPAMD_ENABLE:-false} 
 
 printf '\n
                             ███  ████                            █████            
