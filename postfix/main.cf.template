@@ -13,8 +13,8 @@ mynetworks_style = host
 mydestination = localhost.${MAIL_DOMAIN}, localhost
 
 # Mailbox format
-# home_mailbox = Maildir/
-mailbox_command = /usr/lib/dovecot/deliver -d ${user}@${domain}
+home_mailbox = Maildir/
+mailbox_command = /usr/lib/dovecot/deliver -d ${user}
 
 # Banner
 smtpd_banner = ${MAIL_HOSTNAME} ESMTP
@@ -26,10 +26,13 @@ message_size_limit = 10485760
 smtpd_tls_cert_file = /data/tls/fullchain.pem
 smtpd_tls_key_file = /data/tls/privkey.pem
 
-smtpd_tls_security_level = may
-smtpd_tls_auth_only = no
+smtpd_tls_security_level = encrypt
+smtpd_tls_auth_only = yes
 
 smtp_tls_security_level = may
+
+smtpd_tls_security_level = encrypt   # forces TLS
+smtpd_tls_auth_only = yes             # auth only allowed over TLS
 
 smtpd_tls_loglevel = 1
 smtpd_tls_received_header = yes
@@ -54,13 +57,6 @@ smtpd_recipient_restrictions =
  check_policy_service inet:127.0.0.1:10023,
  reject_unauth_destination
 
-# Virtual Mail
-virtual_mailbox_domains = ${MAIL_DOMAIN}
-virtual_mailbox_base = /data/mail
-virtual_mailbox_maps = hash:/data/virtual_mailboxes
-virtual_minimum_uid = 5000
-virtual_uid_maps = static:5000
-virtual_gid_maps = static:5000
 
 # DKIM / Spam
 smtpd_milters = inet:127.0.0.1:8891, inet:127.0.0.1:8893
