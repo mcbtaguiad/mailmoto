@@ -1,4 +1,4 @@
-FROM ubuntu:26.04
+FROM debian:trixie
 
 LABEL Maintainer="Mark Taguiad <marktaguiad@marktaguiad.dev>"
 LABEL Description="Docker MailMoTo"
@@ -8,9 +8,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y \
         postfix \
+	dovecot-core \
         dovecot-imapd \
         dovecot-pop3d \
         dovecot-core \
+	dovecot-lmtpd \
         mailutils \
 	opendkim \
 	opendkim-tools \
@@ -37,6 +39,9 @@ RUN groupadd -g 5000 vmail \
 RUN mkdir -p /data/mail \
  && chown -R vmail:vmail /data
 
+RUN mkdir -p /var/spool/postfix/private \
+ && chown postfix:postfix /var/spool/postfix/private \
+ && chmod 770 /var/spool/postfix/private
 
 # Postfix configs 
 COPY postfix/main.cf.template /etc/postfix/main.cf.template
